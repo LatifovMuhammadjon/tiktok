@@ -122,7 +122,7 @@ STATIC_URL = "static/"
 
 TIKTOK_CLIENT_KEY = "awqvst4u8ztdh4u2"
 TIKTOK_CLIENT_SECRET = "HYL43ljehcPATwPKiDOgYoATYyww8HKu"
-TIKTOK_REDIRECT_URI = "https://3adf-213-230-100-143.ngrok-free.app/tiktok/callback/"
+TIKTOK_REDIRECT_URI = "https://tiktok-sy3r.onrender.com/tiktok/callback/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
