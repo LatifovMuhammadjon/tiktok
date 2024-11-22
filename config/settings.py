@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-nf9*i+ww5^cr$-q+*w0)so)!5iouicw(#pzvcje=j8#)c3&vu%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['tiktok-sy3r.onrender.com']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
