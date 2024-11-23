@@ -1,6 +1,7 @@
 from django.shortcuts import redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.conf import settings
+import os
 import requests
 from .models import TikTokToken
 import random
@@ -58,3 +59,12 @@ def tiktok_callback(request):
             )
             return JsonResponse({"message": "TikTok token saved successfully!"})
     return JsonResponse({"error": response.json()}, status=400)
+
+
+def file_download_view(request):
+    filename = "tiktokwky1RKcvmi5COrMgUDl7AzhZ4MiVjfva.txt"
+    file_path = os.path.join(settings.BASE_DIR, filename)
+    
+    # Return a FileResponse for file download
+    response = FileResponse(open(file_path, 'rb'), as_attachment=True)
+    return response
