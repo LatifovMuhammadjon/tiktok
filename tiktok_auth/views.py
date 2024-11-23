@@ -55,22 +55,7 @@ def tiktok_callback(request):
         # Ensure the response is successful
         if response.status_code == 200:
             response_data = response.json()
-            data = response_data.get("data")
-
-            # Save or update the TikTok token
-            if data:
-                TikTokToken.objects.update_or_create(
-                    user=request.user,  # Ensure user is authenticated
-                    defaults={
-                        "access_token": data["access_token"],
-                        "refresh_token": data.get("refresh_token"),
-                        "scopes": ','.join(data.get("scope", [])),
-                        "expires_in": data["expires_in"],
-                    }
-                )
-                return JsonResponse({"message": "TikTok token saved successfully!"})
-            else:
-                return JsonResponse({"error": "Missing data in TikTok response"}, status=400)
+            return JsonResponse(response.json())
         else:
             # Handle non-200 responses
             error_response = response.json()
