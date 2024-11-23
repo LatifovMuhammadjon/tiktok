@@ -1,9 +1,10 @@
 from django.shortcuts import redirect
 from django.http import JsonResponse, FileResponse
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from .models import TikTokToken  # Update to your actual model import
 import os
 import requests
-from .models import TikTokToken
 import random
 import string
 
@@ -14,7 +15,6 @@ def generate_csrf_token():
 def tiktok_authorize(request):
     csrf_token = generate_csrf_token()
     request.session['csrf_token'] = csrf_token
-
     auth_url = (
         "https://www.tiktok.com/v2/auth/authorize/"
         f"?client_key={settings.TIKTOK_CLIENT_KEY}"
@@ -26,15 +26,18 @@ def tiktok_authorize(request):
     return redirect(auth_url)
 
 
-
+@csrf_exempt
 def tiktok_callback(request):
+    # Retrieve code and state from the query parameters
     code = request.GET.get('code')
     state = request.GET.get('state')
     stored_state = request.session.get('csrf_token')
 
-    if not code or state != stored_state:
+    # Validate state and code
+    if not code or not state or state != stored_state:
         return JsonResponse({"error": "Invalid state or missing code"}, status=400)
 
+    # Prepare the payload for the token exchange
     token_url = "https://open.tiktokapis.com/v2/oauth/token/"
     payload = {
         "client_key": settings.TIKTOK_CLIENT_KEY,
@@ -44,21 +47,38 @@ def tiktok_callback(request):
         "redirect_uri": settings.TIKTOK_REDIRECT_URI,
     }
 
-    response = requests.post(token_url, json=payload)
-    if response.status_code == 200:
-        data = response.json().get("data")
-        if data:
-            TikTokToken.objects.update_or_create(
-                user=request.user,  # Assuming the user is authenticated
-                defaults={
-                    "access_token": data["access_token"],
-                    "refresh_token": data.get("refresh_token"),
-                    "scopes": ','.join(data.get("scope", [])),
-                    "expires_in": data["expires_in"],
-                }
-            )
-            return JsonResponse({"message": "TikTok token saved successfully!"})
-    return JsonResponse({"error": response.json()}, status=400)
+    try:
+        # Make a POST request with the correct headers
+        headers = {"Content-Type": "application/json"}
+        response = requests.post(token_url, json=payload, headers=headers)
+
+        # Ensure the response is successful
+        if response.status_code == 200:
+            response_data = response.json()
+            data = response_data.get("data")
+
+            # Save or update the TikTok token
+            if data:
+                TikTokToken.objects.update_or_create(
+                    user=request.user,  # Ensure user is authenticated
+                    defaults={
+                        "access_token": data["access_token"],
+                        "refresh_token": data.get("refresh_token"),
+                        "scopes": ','.join(data.get("scope", [])),
+                        "expires_in": data["expires_in"],
+                    }
+                )
+                return JsonResponse({"message": "TikTok token saved successfully!"})
+            else:
+                return JsonResponse({"error": "Missing data in TikTok response"}, status=400)
+        else:
+            # Handle non-200 responses
+            error_response = response.json()
+            return JsonResponse({"error": "Failed to retrieve token", "details": error_response}, status=response.status_code)
+
+    except requests.exceptions.RequestException as e:
+        # Handle network-related exceptions
+        return JsonResponse({"error": "Request failed", "details": str(e)}, status=500)
 
 
 def file_download_view(request):
