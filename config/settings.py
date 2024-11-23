@@ -120,8 +120,8 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 
-TIKTOK_CLIENT_KEY = "awqvst4u8ztdh4u2"
-TIKTOK_CLIENT_SECRET = "HYL43ljehcPATwPKiDOgYoATYyww8HKu"
+TIKTOK_CLIENT_KEY = "sbawzey51uiyfqg4hn"
+TIKTOK_CLIENT_SECRET = "lzE0adAbZEfqNmNLxDaxEDXq1jZPIn80"
 TIKTOK_REDIRECT_URI = "https://tiktok.mydmtt.uz/tiktok/callback/"
 
 # Default primary key field type
