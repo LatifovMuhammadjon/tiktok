@@ -28,7 +28,6 @@ def tiktok_authorize(request):
 
 @csrf_exempt
 def tiktok_callback(request):
-    # Retrieve code and state from the query parameters
     code = request.GET.get('code')
     state = request.GET.get('state')
     stored_state = request.session.get('csrf_token')
@@ -37,7 +36,6 @@ def tiktok_callback(request):
     if not code or not state or state != stored_state:
         return JsonResponse({"error": "Invalid state or missing code"}, status=400)
 
-    # Prepare the payload for the token exchange
     token_url = "https://open.tiktokapis.com/v2/oauth/token/"
     payload = {
         "client_key": settings.TIKTOK_CLIENT_KEY,
@@ -49,8 +47,8 @@ def tiktok_callback(request):
 
     try:
         # Make a POST request with the correct headers
-        headers = {"Content-Type": "application/json"}
-        response = requests.post(token_url, json=payload, headers=headers)
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        response = requests.post(token_url, data=payload, headers=headers)
 
         # Ensure the response is successful
         if response.status_code == 200:
