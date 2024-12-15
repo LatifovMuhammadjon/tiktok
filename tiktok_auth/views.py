@@ -2,7 +2,7 @@ from django.shortcuts import redirect
 from django.http import JsonResponse, FileResponse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
-from .models import TikTokToken  # Update to your actual model import
+from .models import TikTokToken
 import os
 import requests
 import random
@@ -65,7 +65,7 @@ def tiktok_callback(request):
 
 
 def file_download_view(request):
-    filename = "tiktokwky1RKcvmi5COrMgUDl7AzhZ4MiVjfva.txt"
+    filename = "tiktok2sUpCBBU3l1n44Sg9gHI1XRuZxjG67Wt.txt"
     file_path = os.path.join(settings.BASE_DIR, filename)
     
     # Return a FileResponse for file download
